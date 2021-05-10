@@ -1,0 +1,76 @@
+﻿@page "/testscoreinfo"
+
+@inject IStudentService studentService
+@inject ITestScoreService testScoreService
+@inject IJSRuntime jsRuntime
+
+<h3><b>Enter TestScore Information</b></h3>
+<br/>
+<div>
+    <EditForm Model="@testScore" OnValidSubmit="@SubmitTestScore">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">*Student Id : </label>
+            <InputSelect id="studentId" @bind-Value="testScore.studentId">
+                @foreach (var _student in @studentsList)
+                {
+                    var id = _student.studentId;
+                    <option value="@id">@id</option>
+                }
+            </InputSelect>
+        </div>
+        <br/>
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">*Subject Id : </label>
+            <InputSelect id="subjectId" @bind-Value="testScore.subjectId">
+                @foreach (var id in Enum.GetValues(typeof(SubjectId)))
+                {
+                    <option value="@id">@id</option>
+                }
+            </InputSelect> 
+        </div>
+        <br/>
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">*Score : </label>
+            <InputNumber id="score" @bind-Value="testScore.score" placeholder="score"/>
+        </div>
+        <br/>
+        <div class="col-12 row">
+            <label class="col-2 font-weight-bold">*Semester : </label>
+            <InputNumber id="semester" @bind-Value="testScore.semester" placeholder="semester"/>
+        </div>
+        <br/>
+        <div class="col-12 row">
+            <span class="col-2"></span>
+            <input type="submit" class="form-control col-1 btn btn-primary" value="Save" />
+            <span>&nbsp;</span>
+            <button class="btn btn-primary" @onclick="ClearTestScore">Clear</button>
+        </div>
+    </EditForm>
+</div>
+@code {
+    public TestScore testScore{get; set;}
+    public List<TestScore> testScoresList = default;
+    public List<Student> studentsList = default;
+    protected override void OnInitialized()
+    {
+        testScore = new TestScore("0000", SubjectId.Etc, 0, 1901);
+        testScoresList = testScoreService.GetScores();
+        studentsList = studentService.GetStudents();
+    }
+    private void SubmitTestScore(){
+        PrintDescriptionAsync( testScoreService.AddTestScore(testScore));
+        testScore = new TestScore("0000", SubjectId.Etc, 0, 1901);
+        return;
+    }
+    private void ClearTestScore(){
+        testScore = new TestScore("0000", SubjectId.Etc, 0, 1901);
+    }
+    private void RemoveTestScore(string id){
+        PrintDescriptionAsync(testScoreService.RemoveTestScoreById(id));
+    }
+    private async void PrintDescriptionAsync(ResultCode code){
+        await jsRuntime.InvokeVoidAsync("alert", $"{code.id}\n{code.description}!");
+    }
+}
