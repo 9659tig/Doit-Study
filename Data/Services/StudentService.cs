@@ -24,7 +24,7 @@ namespace StudentManager.Data.Services
         }
 
         public async Task<Student> GetAsync(string id){
-            await _students.Find<TestScore>(student => student.Id == id).FirstOrDefaultAsync();
+            await _students.Find(student => student.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<Student> GetByStudentIdAsync(string id){
@@ -41,14 +41,14 @@ namespace StudentManager.Data.Services
 
         public async Task RemoveByStudentIdAsync(string id){
             Student student = await GetByStudentIdAsync(id);
-            await _students.DeleteOneAsync(s => s.Id == student.Id);        
+            await _students.DeleteOneAsync(st => st.Id == student.Id);        
         }
         public async Task RemoveAsync(Student studentIn){
-            await _students.DeleteOneAsync(s => s.Id == studentIn.Id);
+            await _students.DeleteOneAsync(st => st.Id == studentIn.Id);
         }
 
         public async Task Remove(string id){
-            await _students.DeleteOneAsync(s => s.Id == id);
+            await _students.DeleteOneAsync(st => st.Id == id);
         }
     }
 }
